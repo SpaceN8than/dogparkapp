@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Permissions-Policy" content="geolocation=(self)">
     <title>Dog Park Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -13,19 +12,20 @@
     <div id="map"></div>
 
     <script>
-        var map = L.map('map').setView([39.8283, -98.5795], 5); // USA Center
+        // Initialize the map centered on the USA
+        var map = L.map('map').setView([39.8283, -98.5795], 5);
 
         // Add OpenStreetMap tiles (FREE)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Example Dog Park Locations
+        // Sample Dog Parks with Name, Latitude & Longitude
         var dogParks = [
             { name: "Central Park Dog Run", lat: 40.785091, lon: -73.968285 },
             { name: "Griffith Park Dog Park", lat: 34.136554, lon: -118.294200 },
             { name: "Lincoln Park Dog Park", lat: 41.921438, lon: -87.647051 },
-            { name: "Golden Gate Dog Park", lat: 37.769421, lon: -122.486214 },
+            { name: "Golden Gate Park Dog Park", lat: 37.769421, lon: -122.486214 },
             { name: "Zilker Park Dog Area", lat: 30.267153, lon: -97.743057 }
         ];
 
@@ -33,23 +33,38 @@
         dogParks.forEach(function(park) {
             L.marker([park.lat, park.lon])
                 .addTo(map)
-                .bindPopup("<b>" + park.name + "</b><br>Great place for dogs! 🐶");
+                .bindPopup("<b>" + park.name + "</b><br>🐶 Great place for dogs!");
         });
 
-             // Get User Location
-        function onLocationFound(e) {
-            var userMarker = L.marker(e.latlng).addTo(map)
+        // Function to Handle User Location Success
+        function getLocation(position) {
+            var userLat = position.coords.latitude;
+            var userLon = position.coords.longitude;
+
+            L.marker([userLat, userLon])
+                .addTo(map)
                 .bindPopup("<b>You are here!</b> 🏠").openPopup();
-            map.setView(e.latlng, 13);
+
+            map.setView([userLat, userLon], 13);
         }
-        
-        function onLocationError(e) {
-            alert("Geolocation access is denied. Please enable location services in your browser settings.");
+
+        // Function to Handle Errors
+        function showError(error) {
+            alert("Geolocation error: " + error.message);
         }
-        
-        map.locate({ setView: true, maxZoom: 16, watch: true });
-        map.on("locationfound", onLocationFound);
-        map.on("locationerror", onLocationError);
+
+        // Request Location Permissions Before Attempting Geolocation
+        navigator.permissions.query({ name: "geolocation" }).then(function(result) {
+            if (result.state === "granted") {
+                console.log("Geolocation permission granted.");
+                navigator.geolocation.getCurrentPosition(getLocation, showError);
+            } else if (result.state === "prompt") {
+                console.log("Geolocation permission needs to be requested.");
+                navigator.geolocation.getCurrentPosition(getLocation, showError);
+            } else {
+                alert("Location access denied. Please enable it in browser settings.");
+            }
+        });
 
     </script>
 </body>
