@@ -12,18 +12,37 @@
     <div id="map"></div>
 
     <script>
-        var map = L.map('map').setView([39.8283, -98.5795], 4); // Centered on USA
+        var map = L.map('map').setView([39.8283, -98.5795], 5); // Centered on USA
 
         // Add OpenStreetMap tiles (FREE)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Get User Location
+        // Sample Dog Parks with Name, Latitude & Longitude
+        var dogParks = [
+            { name: "Central Park Dog Run", lat: 40.785091, lon: -73.968285 },
+            { name: "Griffith Park Dog Park", lat: 34.136554, lon: -118.294200 },
+            { name: "Lincoln Park Dog Park", lat: 41.921438, lon: -87.647051 },
+            { name: "Golden Gate Park Dog Park", lat: 37.769421, lon: -122.486214 },
+            { name: "Zilker Park Dog Area", lat: 30.267153, lon: -97.743057 }
+        ];
+
+        // Add Dog Park Markers to Map
+        dogParks.forEach(function(park) {
+            L.marker([park.lat, park.lon])
+                .addTo(map)
+                .bindPopup("<b>" + park.name + "</b><br>🐶 Great place for dogs!");
+        });
+
+        // Get User Location and Add a Marker
         function onLocationFound(e) {
-            var userMarker = L.marker(e.latlng).addTo(map)
-                .bindPopup("You are here").openPopup();
-            map.setView(e.latlng, 15);
+            var userMarker = L.marker(e.latlng, {
+                icon: L.divIcon({ className: 'user-location', html: '📍', iconSize: [30, 30] })
+            }).addTo(map)
+            .bindPopup("<b>You are here!</b> 🏠").openPopup();
+
+            map.setView(e.latlng, 13);
         }
 
         function onLocationError(e) {
