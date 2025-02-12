@@ -36,20 +36,21 @@
                 .bindPopup("<b>" + park.name + "</b><br>Great place for dogs! 🐶");
         });
 
-        // Get User Location
+             // Get User Location
         function onLocationFound(e) {
-            var userMarker = L.marker(e.latlng, {color: "blue"}).addTo(map)
-                .bindPopup("You are here 🏠").openPopup();
+            var userMarker = L.marker(e.latlng).addTo(map)
+                .bindPopup("<b>You are here!</b> 🏠").openPopup();
             map.setView(e.latlng, 13);
         }
-
+        
         function onLocationError(e) {
-            alert("Location access denied.");
+            alert("Geolocation access is denied. Please enable location services in your browser settings.");
         }
-
-        map.locate({setView: true, maxZoom: 16, watch: true});
+        
+        map.locate({ setView: true, maxZoom: 16, watch: true });
         map.on("locationfound", onLocationFound);
         map.on("locationerror", onLocationError);
+
     </script>
 </body>
 </html>
